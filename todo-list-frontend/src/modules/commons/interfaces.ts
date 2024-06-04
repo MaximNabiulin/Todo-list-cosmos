@@ -1,0 +1,1 @@
+export type Unsaved<T extends object> = Omit<T, '_id'>
