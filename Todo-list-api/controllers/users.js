@@ -20,6 +20,14 @@ const {
   VALIDATION_USER_CREATE_ERROR,
 } = require('../utils/responseMessage');
 
+class UserResource {
+  static async getEmployees(managerId) {
+    return User.find({ manager: managerId });
+  }
+}
+
+module.exports.UserResource = UserResource;
+
 module.exports.login = (req, res, next) => {
   const { login, password } = req.body;
   return User.findUserByCredentials(login, password)
@@ -61,6 +69,15 @@ module.exports.getCurrentUser = async (req, res, next) => {
     if (err.name === 'CastError') {
       return next(new ValidationError(VALIDATION_USER_ID_ERROR));
     }
+    return next(err);
+  }
+};
+
+module.exports.getMyEmployees = async (req, res, next) => {
+  try {
+    const users = await UserResource.getEmployees(req.user._id);
+    return res.send(users);
+  } catch (err) {
     return next(err);
   }
 };

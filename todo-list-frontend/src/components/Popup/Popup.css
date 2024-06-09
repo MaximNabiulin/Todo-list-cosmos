@@ -10,13 +10,13 @@
   font-family: 'Inter', 'Arial', sans-serif;
   visibility: hidden;
   opacity: 0;
+  background-color: rgba(0, 0, 0, 0.4);
   transition: visibility 0.3s, opacity 0.3s linear;
 }
 
 .popup_opened {
   visibility: visible;
   opacity: 1;
-  /* transition: visibility 0s, opacity 0.3s linear; */
 }
 
 .popup__content {
@@ -32,5 +32,22 @@
   border-radius: 10px;
   position: relative;
   z-index: 1;
+}
+
+.popup__close-button {
+  width: 32px;
+  height: 32px;
+  background-size: cover;
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  position: absolute;
+  top: calc(-1*(8px + 32px));
+  right: calc(-1*(8px + 32px));
+  cursor: pointer;
+  transition: opacity 0.1s;
+}
+
+.popup__close-button:hover {
+  opacity: 0.6;
 }
 

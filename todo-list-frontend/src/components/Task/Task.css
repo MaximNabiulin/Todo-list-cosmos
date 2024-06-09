@@ -1,0 +1,26 @@
+.task__wrapper {
+  width: 80%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 20%);
+  gap: 20px;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.task__element {
+  margin: 0 0 7px;
+  color: grey;
+}
+
+.task__element_done {
+  color: green;
+}
+
+.task__element_overdue {
+  color: red;
+}
+
+.task__element_cancelled {
+  text-decoration: line-through;
+}

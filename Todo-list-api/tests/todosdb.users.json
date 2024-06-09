@@ -1,0 +1,71 @@
+[{
+  "_id": {
+    "$oid": "66573cd79db4fa051ef15e23"
+  },
+  "firstName": "Илон",
+  "lastName": "Маск",
+  "patronymic": "Эрролович",
+  "login": "Ilona",
+  "email": "Ilon@gmail.com",
+  "password": "$2a$10$lWFXezKR49iSeRQbpePKWu2jFTQ0gqPFQoK2GMyUIbCCcVxzV73sS",
+  "manager": null,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66573e819db4fa051ef15e2a"
+  },
+  "firstName": "Иван",
+  "lastName": "Иванов",
+  "patronymic": "Иванович",
+  "login": "Ivan",
+  "email": "Ivan@gmail.com",
+  "password": "$2a$10$BxKRo1wVinsV3L8drmDit.XEPAGLjBDP0w.MGO0bK04b/hzEsXGie",
+  "manager": {
+    "$oid": "66573cd79db4fa051ef15e23"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "665746f2dacea6561b0ffeba"
+  },
+  "firstName": "Петр",
+  "lastName": "Петров",
+  "patronymic": "Петрович",
+  "login": "Petr",
+  "email": "Petr@gmail.com",
+  "password": "$2a$10$Wtyg3BQ.RmFlZXOF5rg9WeopsxudPwWP9g51twl5VbH4nPUcUnZV6",
+  "manager": {
+    "$oid": "66573cd79db4fa051ef15e23"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66575314513a8959cc810f1b"
+  },
+  "firstName": "Василиса",
+  "lastName": "Пупкина",
+  "patronymic": "Васильевна",
+  "login": "Ivan23333",
+  "email": "Ivan245@gmail.com",
+  "password": "$2a$10$J1JY/8E74.YLBDHIjvbTXOhMACaEGB/V4Q/LBHTLCWeh9kPRu8kEK",
+  "manager": {
+    "$oid": "66573cd79db4fa051ef15e23"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6658bf5abf9897e4c0d9aec0"
+  },
+  "firstName": "Incognito",
+  "lastName": "Тестов",
+  "patronymic": "Тествич",
+  "login": "test",
+  "email": "Test245@gmail.com",
+  "password": "$2a$10$adppF.kgjdcmP0B9Pz14C.HkcFFVxAQBjoodHge8igcrj4FTmWLc.",
+  "manager": null,
+  "__v": 0
+}]

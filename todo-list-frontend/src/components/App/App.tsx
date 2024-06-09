@@ -17,16 +17,17 @@ import mainApi from '../../utils/MainApi';
 import * as auth from '../../utils/auth';
 import {
   checkLoginError,
-  // checkTaskCreateError,
-  // checkTaskUpdateError,
-  // UPDATE_SUCCESS_MESSAGE,
 } from '../../utils/utils';
 
 import './App.css';
-import { ITask, ITaskDto } from '../../modules/tasks/interfaces';
 import { IUser } from '../../modules/users/interfaces';
-import TaskEditor from '../TaskEditor/TaskEditor';
+import { IGroupedTask, ITask } from '../../modules/tasks/interfaces';
 import { PRIORITY, STATUS } from '../../modules/tasks/constants';
+import { DATE_FILTER_OPTIONS } from '../../modules/tasks/constants';
+import Task from '../Task/Task';
+import TaskEditor, { ITaskFormValues, getTaskFormValuesFromTask } from '../TaskEditor/TaskEditor';
+import Filters from '../Filters/Filters';
+import { FILTER_OPTONS } from '../../modules/users/constants';
 
 function App() {
   // Стейт переменная открытия попапа
@@ -42,10 +43,8 @@ function App() {
 
   // Стэйт переменныя для данных задачи
   const [tasks, setTasks] = React.useState<ITask[]>([]);
-  const [currentEditorData, setCurrentEditorData] = React.useState<Partial<ITask> | null>(null);
-  // const [updateError, setUpdateError] = React.useState('');
-  // const [updateSuccessMessage, setUpdateSuccessMessage] = React.useState('');
-  // const [isOnEdit, setIsOnEdit] = React.useState(false);
+  const [currentEditorData, setCurrentEditorData] = React.useState<ITaskFormValues | null>(null);
+  const [isTaskUpdate, setIsTaskUpdate] = React.useState(false);
 
   // Стейт переменная для индикаторов загрузки запросов на сервер
   const [isLoading, setIsLoading] = React.useState(false);
@@ -56,15 +55,15 @@ function App() {
   function handleAddtaskButtonClick() {
     if (!currentUser) return;
 
-    const initValues: Partial<ITask> & {responsible?: string} = {
+    const initValues: ITaskFormValues = {
       title: '',
       description: '',
-      dueDate: new Date().toISOString(),
+      dueDate: new Date(),
       priority: PRIORITY.medium,
       status: STATUS.toDo,
       responsible: currentUser._id,
     }
-
+    setIsTaskUpdate(false);
     setCurrentEditorData(initValues);
     console.log("handleAddtaskButtonClick");
     setIsEditorOpen(true);
@@ -75,7 +74,7 @@ function App() {
   }
 
   // --- ОБРАБОТЧИКИ ЗАПРОСОВ ---
-  // Обработчик добавления задачи
+  // Обработчик добавления и обновления задач
   function handleTaskSubmit() {
     setIsLoading(true);
     mainApi.getInitialTasks()
@@ -91,44 +90,52 @@ function App() {
       });
   }
 
-  // Обработчик клика по задаче
+  // Обработчик клика по задаче для редактирования
   const handleTaskClick = (task: ITask) => {
-    console.log(task);
-    setCurrentEditorData(task);
+    setIsTaskUpdate(true);
+    setCurrentEditorData(getTaskFormValuesFromTask(task));
     setIsEditorOpen(true);
-    // setSelectedTask(selectedTask);
-    // setIsAddTaskPopupOpen(true);
   }
 
-  // function showSuccessMessage() {
-  //   setUpdateSuccessMessage(UPDATE_SUCCESS_MESSAGE);
-  //   setTimeout(() => setUpdateSuccessMessage(''), 3000);
-  // }
+  // Обработчик фильтрации задач
+  const handleFilterSubmit = (filters: {
+    responsible?: string,
+    dueDateRange?: DATE_FILTER_OPTIONS | string,
+    groupBy?: string,
+  }) => {
+    const request: Parameters<typeof mainApi.getTasks>[0] = {}
+    if (filters.responsible && filters.responsible !== '') {
+      if (filters.responsible === FILTER_OPTONS.MY_TEAM) {
+        request.responsible = users.map(user => user._id.toString());
+      } else {
+        request.responsible = filters.responsible;
+      }
+    }
 
-  // function showSubmitError(message) {
-  //   setUpdateError(message);
-  //   setTimeout(() => setUpdateError(''), 5000);
-  // }
+    if (filters.dueDateRange && filters.dueDateRange !== '') {
+      request.dueDateRange = filters.dueDateRange;
+    }
 
-  // Обработчик обнавления задачи
-  // function handleUpdateTask(currentTask) {
-  //   setIsLoading(true);
-  //   mainApi.updateTask(currentTask)
-  //    .then(newTask => {
-  //       const newTasks = tasks.map(task => task._id === currentTask._id? newTask : task);
-  //       setTasks(newTasks);
-  //       // showSuccessMessage();
-  //       closeAllPopups();
-  //     })
-  //    .catch((err) => {
-  //       console.log(err);
-  //       const message = checkTaskUpdateError(err);
-  //       showSubmitError(message);
-  //     })
-  //    .finally(() => {
-  //       setIsLoading(false);
-  //     });
-  // }
+    if (filters.groupBy && filters.groupBy !== '') {
+      request.groupBy = filters.groupBy;
+    }
+    mainApi.getTasks(request)
+    .then((tasks: ITask[] | IGroupedTask[]) => {
+      if ('tasks' in tasks[0]) {
+        const groupedTasks = (tasks as IGroupedTask[]).flatMap(group => group.tasks);
+        setTasks(groupedTasks);
+      } else {
+        setTasks(tasks as ITask[]);
+      }
+    })
+    .catch(err => console.log(err));
+  }
+
+  const handleFilterReset = () => {
+    mainApi.getTasks()
+      .then(setTasks)
+      .catch(err => console.log(err));
+  };
 
   // --- АУТЕНТИФИКАЦИЯ ---
   // Обработчик проверки токена
@@ -169,10 +176,11 @@ function App() {
   }
   // обработчик логаута
   function handleLogout() {
-    navigate('/signin');
+    // navigate('/signin');
     auth.logout()
       .then(() => {
         setIsLoggedIn(oldState => ({ ...oldState, loggedIn: false }));
+        navigate('/signin');
       })
       .catch((err) => {
         console.log(err);
@@ -189,16 +197,13 @@ function App() {
     if (!isLoggedIn.loggedIn) return;
     Promise.all([
       mainApi.getCurrentUser(),
-      mainApi.getAllUsers(),
+      mainApi.getMyEmployees(),
       mainApi.getInitialTasks()
     ])
-      .then(([userInfo, users, tasks]) => {
+      .then(([userInfo, myEmployees, tasks]) => {
         setCurrentUser(userInfo);
-        setUsers(users);
+        setUsers([...myEmployees, userInfo]);
         setTasks(tasks);
-        console.log(userInfo);
-        console.log(users);
-        console.log(tasks);
       })
       .catch((err) => {
         console.log(err);
@@ -225,33 +230,44 @@ function App() {
             <ProtectedRoute >
               <>
                 <header className="header">
-                  <h1>
-                    TODO LIST
+                  <h1 className='header__title'>
+                    Список Задач
                   </h1>
                   <button
                     id="logout"
                     onClick={handleLogout}
-                    className="header__button"
+                    className="header__button logout__button"
                   >
                     Выйти
                   </button>
                   <button
                     id="create task"
                     onClick={handleAddtaskButtonClick}
-                    className="header__button"
+                    className="header__button create-task__button"
                   >
                     Добавить задачу
                   </button>
                 </header>
+                {currentUser ? (
+                  <Filters
+                    name='filter'
+                    users={users}
+                    currentUser={currentUser}
+
+                    onSubmit={handleFilterSubmit}
+                    onReset={handleFilterReset}
+                  />
+                ): null}
                 <section>
-                  <ul>
+                  <ul className='task-list'>
                     {tasks.map((task, index) =>
                       (
                         <li
                           key={index}
                           onClick={handleTaskClick.bind(null, task)}
+                          className='task-list__element'
                         >
-                          {task.title}
+                          <Task task={task}/>
                         </li>
                       )
                     )}
@@ -272,24 +288,11 @@ function App() {
                 name="task"
                 initialData={currentEditorData}
                 users={users}
+                isUpdate={isTaskUpdate}
 
                 onSubmit={handleTaskSubmit}
               />
             </Popup>) : null}
-
-        {/* <Popup
-          isOpen={isAddTaskPopupOpen}
-          isLoading={isLoading}
-          isOnEdit={isOnEdit}
-          currentUser={currentUser}
-          users={users}
-          name="task"
-          onClose={closeAllPopups}
-          title="Редактирование задачи"
-          onSubmit={handleUpdateTask}
-          submitError={userUpdateError}
-          buttonText="Обновить"
-        /> */}
       </div>
     </CurrentUserContext.Provider>
   );

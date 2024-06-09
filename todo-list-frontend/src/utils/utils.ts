@@ -1,7 +1,3 @@
-// переменные для сообщений об ошибках
-
-
-
 // Переменная для собщений об ошибках с сервера
 
 const RESPONSE_ERRORS = {
@@ -15,10 +11,9 @@ const RESPONSE_ERRORS = {
   SIGNIN_DEFAULT: 'При входе произошла ошибка.',
   // Ошибка создания задачи
   TASK_CREATE_ERROR: 'Произошла ошибка при создании задачи',
+  TASK_FORBIDDEN_ERROR: 'Вы не можете назначить ответственного не являющегося вами или вашим подчиненным',
   // Ошибки обновления данных пользователя
-  // UPDATE__NOT_UNIQUE_EMAIL: 'Пользователь с таким Email уже существует.', //409
   UPDATE_DEFAULT: 'При обновлении произошла ошибка.',
-  // UPDATE_SUCCESSULLY: 'Сохранено!',
 };
 
 // сообщение об успешном обновлении задачи
@@ -33,21 +28,21 @@ export const UPDATE_SUCCESS_MESSAGE = 'Данные задачи обновле�
 // }
 
 // проверка типа ошибки при логине
-export function checkLoginError(err: any) {
+export function checkLoginError(err: string | number) {
   if (err === 401) return RESPONSE_ERRORS.SIGNIN_VALIDATION
   if (err === 500) return RESPONSE_ERRORS.SERVER_ERROR;
   return RESPONSE_ERRORS.SIGNIN_DEFAULT;
 }
 
 // проверка типа ошибки при создании и обновлении задачи
-export function checkTaskCreateError(err: any) {
+export function checkTaskCreateError(err: string | number) {
   if (err === 400) return RESPONSE_ERRORS.TASK_CREATE_ERROR;
+  if (err === 'Ошибка: 403') return RESPONSE_ERRORS.TASK_FORBIDDEN_ERROR;
   if (err === 'Ошибка: 500') return RESPONSE_ERRORS.SERVER_ERROR;
   return RESPONSE_ERRORS.UPDATE_DEFAULT;
 }
 
-export function checkTaskUpdateError(err: any) {
-  // if (err === 'Ошибка: 409') return RESPONSE_ERRORS.UPDATE__NOT_UNIQUE_EMAIL
+export function checkTaskUpdateError(err: string | number) {
   if (err === 'Ошибка: 500') return RESPONSE_ERRORS.SERVER_ERROR;
   return RESPONSE_ERRORS.UPDATE_DEFAULT;
 }
@@ -58,14 +53,3 @@ export enum ApiMethod {
   patch='PATCH',
   delete='DELETE',
 }
-
-export enum ApiUrl {
-  default='/',
-  signin='/signin',
-  signout='/signout',
-  users='/users',
-  me='/users/me',
-  tasks='/tasks',
-  currentTask='/task/id'
-}
-

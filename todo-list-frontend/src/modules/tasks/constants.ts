@@ -10,3 +10,14 @@ export enum PRIORITY {
   medium="medium",
   high="high",
 }
+
+export enum DATE_FILTER_OPTIONS {
+  day="day",
+  week="week",
+  future="future",
+}
+
+export enum GROUP_FILTER_OPTIONS {
+  responsible="responsible",
+  dueDateRange="dueDateRange",
+}

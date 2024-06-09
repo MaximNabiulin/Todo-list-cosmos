@@ -1,11 +1,17 @@
+import { DATE_FILTER_OPTIONS } from "../modules/tasks/constants";
 import { Unsaved } from "../modules/commons/interfaces";
-import { ITask, ITaskDto } from "../modules/tasks/interfaces";
+import { ITask } from "../modules/tasks/interfaces";
 
-// import { baseUrl } from './auth';
-const baseUrl = 'http://localhost:3001';
+import { baseUrl } from './auth';
 
 interface IOptions {
   baseUrl: string;
+}
+
+interface ITaskFilter {
+  responsible?: string | string[];
+  dueDateRange?: DATE_FILTER_OPTIONS | string;
+  groupBy?: string,
 }
 
 class MainApi {
@@ -32,7 +38,6 @@ class MainApi {
   getCurrentUser() {
     return this._request(`${this._baseUrl}/users/me`, {
       credentials: 'include',
-      // headers: this._headers
     });
   }
 
@@ -40,7 +45,12 @@ class MainApi {
   getAllUsers() {
     return this._request(`${this._baseUrl}/users`, {
       credentials: 'include',
-      // headers: this._headers
+    });
+  }
+
+  getMyEmployees() {
+    return this._request(`${this._baseUrl}/users/my-employees`, {
+      credentials: 'include',
     });
   }
 
@@ -50,7 +60,27 @@ class MainApi {
   getInitialTasks() {
     return this._request(`${this._baseUrl}/tasks`, {
       credentials: 'include',
-      // headers: this._headers
+    });
+  }
+
+  getTasks(params?: ITaskFilter) {
+    const url = new URL(`${this._baseUrl}/tasks`);
+    if (params) {
+      (Object.keys(params) as (keyof ITaskFilter)[])
+        .forEach(key => {
+          const value = params[key];
+          if (typeof(value) !== 'undefined') {
+            if (Array.isArray(value)) {
+              value.forEach(item => url.searchParams.append(key, item));
+            } else {
+              url.searchParams.append(key, value);
+            }
+          }
+        });
+    }
+    console.log(url);
+    return this._request(url.toString(), {
+      credentials: 'include',
     });
   }
 
@@ -68,9 +98,12 @@ class MainApi {
   }
 
   // 5. Редактирование задачи
-  // updateTaskInfo(data: Partial<ITaskDto>) {
-  updateTaskInfo(data: Partial<ITask>) {
-    return this._request(`${this._baseUrl}/tasks/id`, {
+  updateTaskInfo(data: ITask & {responsible: string}) {
+    console.log('data:', data);
+    const id = data._id
+    delete data._id;
+    // console.log('updateTaskInfo', data);
+    return this._request(`${this._baseUrl}/tasks/${id}`, {
       method: 'PATCH',
       credentials: 'include',
       headers: {
