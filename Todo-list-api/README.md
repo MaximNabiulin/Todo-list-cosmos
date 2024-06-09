@@ -6,7 +6,7 @@
 
 Серверная часть проекта, написана с помощью веб-фреймворка [Express](https://expressjs.com/ru/) для приложений [Node js](https://nodejs.org/en/) и взаимодействующую с базой данных [MongoDB](https://www.mongodb.com/).
 
-Ссылка на репозиторий проекта: [https://github.com/MaximNabiulin/Todo-list-cosmos](https://github.com/MaximNabiulin/Todo-list-cosmos).
+Ссылка на репозиторий проекта: [https://github.com/MaximNabiulin/Todo-list-cosmos/tree/develop](https://github.com/MaximNabiulin/Todo-list-cosmos/tree/develop).
 
 ### Использование
 

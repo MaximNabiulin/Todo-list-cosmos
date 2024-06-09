@@ -11,7 +11,7 @@
 Пользователи не могут изменять атрибуты задач, созданных их руководителями,
 кроме статуса.
 
-Ссылка на репозиторий проекта: [https://github.com/MaximNabiulin/Todo-list-cosmos](https://github.com/MaximNabiulin/Todo-list-cosmos).
+Ссылка на репозиторий проекта: [https://github.com/MaximNabiulin/Todo-list-cosmos/tree/develop](https://github.com/MaximNabiulin/Todo-list-cosmos/tree/develop).
 
 ### Использование
 
